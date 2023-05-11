@@ -10,14 +10,14 @@ import schedule
 DB_HOST = 'localhost'
 DB_PORT = '5432'
 DB_NAME = 'telegram'
-DB_USER = 'khan'
-DB_PASSWORD = 'khan123'
+DB_USER = 'user'
+DB_PASSWORD = 'password'
 
 # Telegram Bot token
-BOT_TOKEN = '5796853731:AAEUdOINfBCClzHBt6_fPE4cpGXxmDhfo_0'
+BOT_TOKEN = 'Add token'
 
 # Telegram private group ID
-PRIVATE_GROUP_ID = '5j1KODgZwEZmYzZk'
+PRIVATE_GROUP_ID = 'Add group id'
 
 async def start(update: Update, context):
     """Handle the /start command."""
