@@ -1,5 +1,3 @@
-Sure! Here's the beautified version of the README.md contents:
-
 # Telegram User Verify
 A bot to verify Telegram users.
 
