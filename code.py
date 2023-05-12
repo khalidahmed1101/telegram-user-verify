@@ -14,10 +14,10 @@ DB_USER = 'user'
 DB_PASSWORD = 'password'
 
 # Telegram Bot token
-BOT_TOKEN = 'Add token'
+BOT_TOKEN = ''
 
 # Telegram private group ID
-PRIVATE_GROUP_ID = 'Add group id'
+PRIVATE_GROUP_ID = ''
 
 async def start(update: Update, context):
     """Handle the /start command."""
