@@ -2,7 +2,7 @@
 import os
 import psycopg2
 from telegram import Update, Bot
-from telegram.ext import Application, CommandHandler
+from telegram.ext import Application, CommandHandler, Job
 from datetime import timedelta
 import schedule
 
@@ -10,14 +10,15 @@ import schedule
 DB_HOST = 'localhost'
 DB_PORT = '5432'
 DB_NAME = 'telegram'
-DB_USER = 'user'
-DB_PASSWORD = 'password'
+DB_USER = 'khan'
+DB_PASSWORD = 'khan123'
 
 # Telegram Bot token
-BOT_TOKEN = ''
+BOT_TOKEN = '6130956551:AAGjR22hqiclpjLGu7zGyl5EXDgCZy-GVHU'
 
 # Telegram private group ID
-PRIVATE_GROUP_ID = ''
+PRIVATE_GROUP_ID = '1927739607'
+application = None  # Global variable to store the Application object
 
 async def start(update: Update, context):
     """Handle the /start command."""
@@ -57,8 +58,10 @@ async def tell_me_my_id(update: Update, context):
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
 
-def cronjob_task(context) -> None:
-    """Cronjob task to ban users from the private channel."""
+
+# async def cronjob_task_wrapper(application: Application):
+async def cronjob_task(context: Application):
+    print("*********************** Running Cronjob task to ban users from the private channel. ********************")
     # Connect to the remote database
     conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD)
     cursor = conn.cursor()
@@ -69,27 +72,37 @@ def cronjob_task(context) -> None:
 
     # Ban each user from the private channel
     bot = context.bot
-    for user_id in banned_users:
-        bot.kick_chat_member(chat_id=PRIVATE_GROUP_ID, user_id=user_id[0])
+    parsed_results = [int(result[0]) for result in banned_users]
+    for user_id in parsed_results:
+        print(int(user_id))
+        try:
+            await bot.banChatMember(chat_id="-100"+PRIVATE_GROUP_ID , user_id=user_id)
+        except Exception as e:
+            print("User with id "+str(user_id)+" isn't available in the group!")
 
+    print('Removed users from group banned!')
     cursor.close()
     conn.close()
+    # await cronjob_task(application)
 
 def main() -> None:
+    global application
+
     """Main function to start the Telegram bot."""
     # Create the updater and dispatcher
-    application = Application.builder().token(BOT_TOKEN).build()
+    application = Application.builder().token(BOT_TOKEN).read_timeout(60).write_timeout(60).build()
 
     # Register command handlers
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CommandHandler('tellmemyid', tell_me_my_id))
     application.add_handler(CommandHandler('letmein', let_me_in))
-    schedule.every(24).hours.do(cronjob_task)  # Run every 24 hours
+
+    job_queue = application.job_queue
+    job_queue.run_repeating(cronjob_task, interval=24*60*60) # 24 hour
 
     # Start the bot
     application.run_polling()
 
-    # Add the cron job to the scheduler
     
 if __name__ == '__main__':
     main()
