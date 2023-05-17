@@ -3,21 +3,23 @@ import os
 import psycopg2
 from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, Job
-from datetime import timedelta
-import schedule
+from datetime import datetime, timedelta
+import pyshorteners
 
 # PostgreSQL database connection parameters
 DB_HOST = 'localhost'
 DB_PORT = '5432'
 DB_NAME = 'telegram'
-DB_USER = 'khan'
-DB_PASSWORD = 'khan123'
+DB_USER = 'user'
+DB_PASSWORD = 'password'
 
 # Telegram Bot token
-BOT_TOKEN = '6130956551:AAGjR22hqiclpjLGu7zGyl5EXDgCZy-GVHU'
+BOT_TOKEN = ''
 
 # Telegram private group ID
-PRIVATE_GROUP_ID = '1927739607'
+PRIVATE_GROUP_ID = ''
+PRIVATE_GROUP_LINK = ""
+
 application = None  # Global variable to store the Application object
 
 async def start(update: Update, context):
@@ -40,10 +42,15 @@ async def let_me_in(update: Update, context):
     user = cursor.fetchone()
     cursor.close()
     conn.close()
+    current_time = datetime.now()
+    expiry_time = current_time + timedelta(hours=1)
+
+    invite_link = await context.bot.createChatInviteLink(chat_id="-100"+PRIVATE_GROUP_ID,
+        expire_date= expiry_time,
+    )
 
     try:
-        invite_link = f"https://t.me/joinchat/{PRIVATE_GROUP_ID}/{user_id_str}"
-        await context.bot.send_message(chat_id=update.message.chat_id, text=invite_link)
+        await context.bot.send_message(chat_id=update.message.chat_id, text=invite_link.invite_link)
     
     except Exception as e:
         # Handle any errors that occur during the invite link generation process
