@@ -42,21 +42,30 @@ async def let_me_in(update: Update, context):
     user = cursor.fetchone()
     cursor.close()
     conn.close()
-    current_time = datetime.now()
-    expiry_time = current_time + timedelta(hours=1)
 
-    invite_link = await context.bot.createChatInviteLink(chat_id="-100"+PRIVATE_GROUP_ID,
-        expire_date= expiry_time,
-    )
+    if user:
+        print("User ID found in the database.")
+        current_time = datetime.now()
+        expiry_time = current_time + timedelta(hours=1)
 
-    try:
-        await context.bot.send_message(chat_id=update.message.chat_id, text=invite_link.invite_link)
-    
-    except Exception as e:
-        # Handle any errors that occur during the invite link generation process
-        error_message = f"An error occurred: {str(e)}"
-        await context.bot.send_message(chat_id=update.message.chat_id, text=error_message)
+        invite_link = await context.bot.createChatInviteLink(
+            chat_id="-100"+PRIVATE_GROUP_ID,
+            expire_date= expiry_time,
+            member_limit=1,
+        )
 
+        try:
+            await context.bot.send_message(chat_id=update.message.chat_id, text=invite_link.invite_link)
+        
+        except Exception as e:
+            # Handle any errors that occur during the invite link generation process
+            error_message = f"An error occurred: {str(e)}"
+            await context.bot.send_message(chat_id=update.message.chat_id, text=error_message)
+
+    else:
+        print("User ID not found in the database.")
+        await context.bot.send_message(chat_id=update.message.chat_id, text="You are not allowed to join!")
+        return
 
 async def tell_me_my_id(update: Update, context):
     """Handler for the /tell-me-my-id command"""
