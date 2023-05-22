@@ -1,4 +1,3 @@
-
 import os
 import psycopg2
 from telegram import Update, Bot,ChatPermissions
@@ -8,29 +7,31 @@ from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError
 from telethon.tl.functions.channels import GetParticipantsRequest
 from telethon.tl.types import ChannelParticipantsSearch
+from telethon.tl.types import InputPeerEmpty
+from telethon.tl.functions.messages import GetDialogsRequest
 import asyncio
 
 
-api_id = 0 #Add telethon api id
-api_hash = 'Telethon api hash'
+api_id = 16264534
+api_hash = '960268f2422add330aed22017be03dc3'
 
 # PostgreSQL database connection parameters
 DB_HOST = 'localhost'
 DB_PORT = '5432'
 DB_NAME = 'telegram'
-DB_USER = 'user'
-DB_PASSWORD = 'password'
+DB_USER = 'khan'
+DB_PASSWORD = 'khan123'
 
 # Telegram Bot token
-BOT_TOKEN = 'bot token'
+BOT_TOKEN = '5796853731:AAEUdOINfBCClzHBt6_fPE4cpGXxmDhfo_0'
 
 # Telegram private group ID
-PRIVATE_GROUP_ID = 'group id'
-PRIVATE_GROUP_LINK = "group link"
+PRIVATE_GROUP_ID = '1927739607'
+PRIVATE_GROUP_LINK = "fohzYqf9E3c0MGM0"
 
 application = None  # Global variable to store the Application object
 
-phone_number = '# phone number to authenticate telethon'
+phone_number = '+923013687327'
 
 async def get_chat_members():
     async with TelegramClient('py_bot', api_id, api_hash) as client:
@@ -166,9 +167,8 @@ async def tell_me_my_id(update: Update, context):
     message = f"Your id is {user.id} and your username is {user.first_name}"
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
-# async def cronjob_task_wrapper(application: Application):
 async def cronjob_task(context: Application):
-    print("*********************** Running Cronjob task to ban/unban users from the private channel. ********************")
+    print("******** Running Cronjob task to ban/unban users from the private channel. *******")
     # Connect to the remote database
     conn = psycopg2.connect(host=DB_HOST, port=DB_PORT, dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD)
     cursor = conn.cursor()
@@ -213,11 +213,11 @@ def main() -> None:
     application.add_handler(CommandHandler('letmein', let_me_in))
 
     job_queue = application.job_queue
-    job_queue.run_repeating(cronjob_task, interval=60*60*24) # 24 hour
+    job_queue.run_repeating(cronjob_task, interval=10) # 24 hour
 
     # Start the bot
     application.run_polling()
 
     
-if __name__ == '__main__':
+if _name_ == '_main_':
     main()
